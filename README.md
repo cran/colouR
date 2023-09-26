@@ -15,7 +15,13 @@ package can be found here:
 
 ## Installation
 
-You can install the development version of colouR from
+You can install `colouR` directly from CRAN via:
+
+``` r
+install.packages("colouR")
+```
+
+Alternativley, you can install the development version of `colouR` from
 [GitHub](https://github.com/) with:
 
 ``` r

@@ -10,7 +10,8 @@ getTopCol(
   exclude = TRUE,
   sig = 4,
   avgCols = TRUE,
-  n_clusters = 5
+  n_clusters = 5,
+  customExclude = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ getTopCol(
 \item{avgCols}{Logical, whether to average the colors by groups. Default is TRUE.}
 
 \item{n_clusters}{Integer, the number of clusters to use for grouping colors. Default is 5.}
+
+\item{customExclude}{Character vector. Optional vector of custom color codes in HEX format to be excluded.}
 }
 \value{
 A data frame with the top colors, their frequency, and percentage in the image.

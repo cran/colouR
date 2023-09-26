@@ -4,10 +4,12 @@
 \alias{excludeCols}
 \title{excludeCols}
 \usage{
-excludeCols(data)
+excludeCols(data, customExclude = NULL)
 }
 \arguments{
 \item{data}{Data frame of colours}
+
+\item{customExclude}{Character vector. Optional vector of custom color codes in HEX format to be excluded.}
 }
 \value{
 No return value, called for side effects.

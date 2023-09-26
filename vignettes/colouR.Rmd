@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 Welcome to the `colouR` package, a useful tool for analyzing and utilizing the colors in images, as well as providing color palettes inspired by Radiohead and Taylor Swift album covers. Whether you are a designer looking for inspiration, a data analyst searching for unique ways to visualize data, or a music lover wanting to incorporate your favorite album colors into your projects, this package is for you. It is recommended to view this instructional guide via the GitHub page: https://alaninglis.github.io/colouR/articles/colouR.html
 
-# Package Overview
+## Package Overview
 
 The `colouR` package provides a set of functions that allows you to:
 
@@ -40,7 +40,7 @@ The `colouR` package provides a set of functions that allows you to:
 * Utilize color palettes inspired by Radiohead and Taylor Swift album covers.
 * These functionalities make the `colouR` package a versatile and easy-to-use tool for exploring and working with colors in images.
 
-# Key Functions
+## Key Functions
 
 Some of the main functions included in the `colouR` package are:
 
@@ -56,13 +56,15 @@ Some of the main functions included in the `colouR` package are:
 
 * `avgHex`: This function takes a data frame with two columns: one for the hex color values and another for the group labels. It calculates the average color for each group and returns a data frame with the group labels and their corresponding average hex colors.
 
+* `img2pal`: Creates a Colour Palette from an input image.
+
 * `plotPalette`: This function takes a data frame with a column of colors and plots the colors as a color palette.
 
 In addition, we provide several utility functions, all of which are demonstrated in this document.
 
 
 
-# Getting Started
+## Getting Started
 
 To begin using the `colouR` package, simply install it from GitHub, load it into your R session, and start exploring the world of colors in images.
 
@@ -77,11 +79,12 @@ library(colouR)
 library(ggplot2)
 ```
 
-# Get the top $n$ colours in an image
+# Get the top n colours in an image
 
 The first function we demonstrate is the `getTopCol` function.  This function reads an image file, extracts the colors, and returns the top n colors based on their frequency in the image. Optionally, black and white shades can be excluded, and the colors can be grouped and averaged (more on colour averaging later!). This function can take in a .jpg, .jpeg, or .png or a url pointing to an image using any of these formats, via the `path` argument and returns the top `n` colours used in the image.
 
 
+## Function Arguments
 The arguments for this function are: 
 
 * `path` Character, the path to the image file (either jpg or png).
@@ -90,8 +93,10 @@ The arguments for this function are:
 * `sig` Integer, the number of decimal places for the color percentage. Default is 4.
 * `avgCols` Logical, whether to average the colors by groups. Default is TRUE.
 * `n_clusters` Integer, the number of clusters to use for grouping colors. Default is 5.
+* `customExclude` Character vector. Optional vector of custom color codes in HEX format to be excluded.
 
 
+## Input Image
 To begin, lets first take a look at a raw image:
 
 <center>
@@ -100,8 +105,9 @@ To begin, lets first take a look at a raw image:
 knitr::include_graphics("https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png")
 ```
 <caption><span id="fig1:fig1">Figure 1: </span>The _"towering inferno of physical perfection"_ that is Bender.</caption>
-
 </center>
+
+## Top 10 colours in image
 
 In the code below we obtain the top 10 most frequent colours used in the image without using any colour grouping or averaging by setting `avgCols = FALSE`. Additionally, we chose not to exclude any black or white shades by setting `exclude = FALSE` (note: the `exclude` argument excludes many black and white shades, however this list is far from exhaustive and, consequently, blacks and white will most likely still be included. However we do allow you to provide additional black and white hex codes to be included in the exclude function... more on that below). The output of the `getTopCols` when setting the outlined parameters is a data frame with three columns, that is, the top colors, their frequency, and percentage in the image.
 
@@ -117,6 +123,7 @@ top10 <- getTopCol(path = "https://raw.githubusercontent.com/AlanInglis/colouR/m
 top10
 ```
 
+## Plot top 10 colours
 
 Plotting the top 10 colours, we can see that the colour white dominates the image with over 51% of the image being white. Since most of this white is probably from the background of the image, this result is not very useful. 
 
@@ -138,7 +145,9 @@ ggplot(top10, aes(x = hex, y = freq)) +
 
 </center>
 
-Since most of this white is probably from the background of the image, this result is not very useful. TO exclude white and black shades we set `exclude = TRUE`
+## Exclude unwanted colours
+
+Since most of this white is probably from the background of the image, this result is not very useful. To exclude white and black shades we set `exclude = TRUE` (more on this below).
 
 ```{r, top10colsExclude}
 set.seed(1701) # for reproducability
@@ -146,7 +155,8 @@ set.seed(1701) # for reproducability
 top10exclude <- getTopCol(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
                           n = 10,
                           avgCols = FALSE,
-                          exclude = TRUE)
+                          exclude = TRUE,
+                          customExclude = NULL)
 ```
 
 Now, plotting these colours gives a more truer representation of the colours used in the image:
@@ -169,7 +179,7 @@ ggplot(top10exclude, aes(x = hex, y = freq)) +
 
 </center>
 
-
+## Average top colours
 In Figure 3, we can see that there are a lot of similar colours. That is, many of the colours are different shades of a metallic blue. By setting `avgCols = TRUE`, we can group together colours with similar shades into $n$ groups via the `n_clusters` argument and average over them to produce a single colour. In this case, we are setting `n_clusters = 5` (this eliminates the need to set the `n` argument).
 
 ```{r, top10colsAvg}
@@ -200,9 +210,28 @@ ggplot(top10avg, aes(x = avg_color, y = freq)) +
 
 </center>
 
-in Figure 4, we can see that several black shade have slipped through the `exclude` filter. However, we can provide additional hex codes by passing them to the `excludeCols` argument. 
+# Excude custom colours 
 
-_(This section still to come!)_
+In Figure 4, we can see that several black shade have slipped through the `exclude` filter. However, we can provide additional hex codes by passing them to the `excludeCols` argument. To illustrate this point, we will use the previously created dataframe of top 10 colours, with the inbuilt black and white shades removed. Examining  the colours we have:
+```{r, look_at_top10}
+top10exclude
+```
+
+However, if we want to exclude any of these colours, we can pass them as a character vector of hex values to the `customExclude` argument, as follows: 
+```{r, exclude_custom}
+coloursToExclude <- c("#A9C5DA", "#7CA5C1", "#C9E0F0", "#5A8595", "#FFFAC2")
+
+top10exclude <- getTopCol(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
+                          n = 10,
+                          avgCols = FALSE,
+                          exclude = TRUE,
+                          customExclude = coloursToExclude)
+```
+
+Now when we look at the `top10exclude` object, it should not contain any of the colours selected.
+```{r, exclude_view}
+top10exclude
+```
 
 # Grouping colours
 
@@ -229,6 +258,7 @@ grCol <- groupCols(hex_colors = cols, n_clusters = 4)
 
 
 
+## Plot Groups
 
 Arranging the data frame by group and plotting gives us:
 
@@ -275,9 +305,35 @@ plotPalette(df = avgCl, color_col = 'avg_color')
 
 In Figure 8, we can see that the four groups have been averaged into single colours. 
 
-# Colour palettes
+# Build Colour Palette from Image
 
-One useful feature of taking in an image and return the top $n$ colours is the ability to turn that image into a colour palette. For fun, we provide colour palettes based on all the studio albums of both Radiohead and Taylor Swift. The palettes can be accessed by indexing either `radiohead_palettes` or `taylor_palettes`, as shown in the code below. It should be noted, that when creating these custom palettes, the top 10 average colours were chosen. The full list of names for Radiohead are:
+The `img2pal` function automates some of the above processes and creates a custom palette, ready to use, directly from an input image. The function arguments mirror those from the `gettpCol` function. In the example below, we are creating a colour palette of the top 10 most frequent colours, while grouping into 15 clusters and averaging the colours.
+Using the same image of Bender from above, we can do the following:
+```{r, img2palette, out.height='70%', out.width='70%', fig.align="center"}
+pal <- img2pal(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
+               n = 10,
+               avgCols = TRUE,
+               exclude = TRUE,
+               n_clusters = 15,
+               customExclude = NULL)
+```
+<center>
+<caption><span id="fig9:fig9">Figure 9: </span>Colour palette created directly from input image.</caption>
+</center>
+
+And we can take a look at the hex codes for the colour palette by checking the newly created `pal`opbject:
+```{r, look_at_palette}
+pal
+```
+
+
+# Prebuilt Palettes
+
+One useful feature of taking in an image and return the top $n$ colours is the ability to turn that image into a colour palette. For fun, we provide colour palettes based on all the studio albums of both Radiohead and Taylor Swift. The palettes can be accessed by indexing either `radiohead_palettes` or `taylor_palettes`, as shown in the code below. It should be noted, that when creating these custom palettes, the top 10 average colours were chosen. 
+
+## Radiohead
+
+The full list of names for Radiohead are:
 
 * `pabloHoney`: Pablo Honey
 * `Bends`     : The Bends
@@ -288,6 +344,8 @@ One useful feature of taking in an image and return the top $n$ colours is the a
 * `inRainbows`: In Rainbows
 * `tkol`      : The King of Limbs
 * `amsp`      : A Moon Shaped Pool
+
+## Taylor Swift
 
 The full list of names for Taylor Swift are:
 
@@ -307,20 +365,22 @@ radiohead_palettes$pabloHoney
 taylor_palettes$red
 ```
 
+## Palette Plots
+
 To view any of the palettes, we can use the `plotPalette` function:
 
 ```{r, rhpal, out.height='70%', out.width='70%', fig.align="center"}
 plotPalette(radiohead_palettes$okComputer)
 ```
 <center>
-<caption><span id="fig9:fig9">Figure 9: </span>Radiohead OK Computer colour palette.</caption>
+<caption><span id="fig10:fig10">Figure 10: </span>Radiohead OK Computer colour palette.</caption>
 </center>
 
 ```{r, typal, out.height='70%', out.width='70%', fig.align="center"}
 plotPalette(taylor_palettes$red)
 ```
 <center>
-<caption><span id="fig10:fig10">Figure 10: </span>Taylor Swift Red colour palette.</caption>
+<caption><span id="fig11:fig11">Figure 11: </span>Taylor Swift Red colour palette.</caption>
 </center>
 
 Additionally, to create a larger colour palette we provide the `colPalette` function. This function generates a custom color palette based on the specified `palette` name. The color palettes are sourced from two predefined lists: `taylor_palettes` and `radiohead_palettes`. For example
@@ -332,7 +392,7 @@ tpal <- tswift_palette(20)
 plotPalette(tpal)
 ```
 <center>
-<caption><span id="fig11:fig11">Figure 11: </span>Taylor Swift Repuatation colour palette.</caption>
+<caption><span id="fig12:fig12">Figure 12: </span>Taylor Swift Repuatation colour palette.</caption>
 </center>
 
 # Use in ggplot
@@ -362,7 +422,7 @@ ggplot(mpgsort, aes(x = manufacturer, y= count, fill = manufacturer)) +
   scaleFill(palette = "pabloHoney", guide = "none")
 ```
 <center>
-<caption><span id="fig12:fig12">Figure 12: </span>Displaying data using a Radiohead colour palette and `scaleFill`.</caption>
+<caption><span id="fig13:fig13">Figure 13: </span>Displaying data using a Radiohead colour palette and `scaleFill`.</caption>
 </center>
 
 
@@ -378,7 +438,7 @@ ggplot(mpgsort, aes(x = manufacturer, y= count, fill = manufacturer)) +
   scaleFill(palette = "evermore", guide = "none")
 ```
 <center>
-<caption><span id="fig13:fig13">Figure 13: </span>Displaying data using a Taylor Swift colour palette and `scaleFill`.</caption>
+<caption><span id="fig14:fig14">Figure 14: </span>Displaying data using a Taylor Swift colour palette and `scaleFill`.</caption>
 </center>
 
 Similarly, to use `scaleColor`:
@@ -393,7 +453,7 @@ ggplot(mpg[1:122,],  aes(x = displ, y = cty, color = manufacturer)) +
   theme_minimal()
 ```
 <center>
-<caption><span id="fig14:fig14">Figure 14: </span>Displaying data using a Radiohead colour palette and `scaleColor`.</caption>
+<caption><span id="fig15:fig15">Figure 15: </span>Displaying data using a Radiohead colour palette and `scaleColor`.</caption>
 </center>
 
 And using a Taylor Swift palette:
@@ -407,7 +467,7 @@ ggplot(mpg[1:122,],  aes(x = displ, y = cty, color = manufacturer)) +
   theme_minimal()
 ```
 <center>
-<caption><span id="fig15:fig15">Figure 15: </span>Displaying data using a Taylor Swift colour palette and `scaleColor`.</caption>
+<caption><span id="fig16:fig16">Figure 16: </span>Displaying data using a Taylor Swift colour palette and `scaleColor`.</caption>
 </center>
 
 Of course, we can use these palettes in a more _traditional_ way by passing the palette to ggplot. For example:
@@ -438,7 +498,7 @@ ggplot(data, aes(x = X, y = Y)) +
 
 ```
 <center>
-<caption><span id="fig16:fig16">Figure 16: </span>Heatmap displaying data using a Taylor Swift colour palette.</caption>
+<caption><span id="fig17:fig17">Figure 17: </span>Heatmap displaying data using a Taylor Swift colour palette.</caption>
 </center>
 
 
@@ -471,6 +531,6 @@ plot(c(100, 250), c(300, 550), type = "n", xlab = "", ylab = "")
 rasterImage(image,100,300,150,550)
 ```
 <center>
-<caption><span id="fig17:fig17">Figure 17: </span>Reading in an image from a url.</caption>
+<caption><span id="fig18:fig18">Figure 18: </span>Reading in an image from a url.</caption>
 </center>
 

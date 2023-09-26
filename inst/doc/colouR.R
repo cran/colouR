@@ -46,7 +46,8 @@ set.seed(1701) # for reproducability
 top10exclude <- getTopCol(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
                           n = 10,
                           avgCols = FALSE,
-                          exclude = TRUE)
+                          exclude = TRUE,
+                          customExclude = NULL)
 
 ## ---- top10colsPlotExclude, out.height='70%', out.width='70%', fig.align="center"----
 # order factors
@@ -80,6 +81,21 @@ ggplot(top10avg, aes(x = avg_color, y = freq)) +
   xlab('Average colour') +
   ylab('Frequency')
 
+## ---- look_at_top10-----------------------------------------------------------
+top10exclude
+
+## ---- exclude_custom----------------------------------------------------------
+coloursToExclude <- c("#A9C5DA", "#7CA5C1", "#C9E0F0", "#5A8595", "#FFFAC2")
+
+top10exclude <- getTopCol(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
+                          n = 10,
+                          avgCols = FALSE,
+                          exclude = TRUE,
+                          customExclude = coloursToExclude)
+
+## ---- exclude_view------------------------------------------------------------
+top10exclude
+
 ## ---- palette,  out.height='70%', out.width='70%', fig.align="center"---------
 hex_colors <- c("#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#1050FF", "#ffff50")
 
@@ -112,6 +128,17 @@ set.seed(1701)
 avgCl <- avgHex(df = grCol, group_col = 'group', hex_col = 'hex_color')
 avgCl
 plotPalette(df = avgCl, color_col = 'avg_color')
+
+## ---- img2palette, out.height='70%', out.width='70%', fig.align="center"------
+pal <- img2pal(path = "https://raw.githubusercontent.com/AlanInglis/colouR/master/images/bender.png",
+               n = 10,
+               avgCols = TRUE,
+               exclude = TRUE,
+               n_clusters = 15,
+               customExclude = NULL)
+
+## ---- look_at_palette---------------------------------------------------------
+pal
 
 ## ---- pals--------------------------------------------------------------------
 radiohead_palettes$pabloHoney

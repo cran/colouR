@@ -1,7 +1,7 @@
 Package: colouR
 Type: Package
 Title: Create Colour Palettes from Images
-Version: 0.1.0
+Version: 0.1.1
 Author: Alan Inglis
 Maintainer: Alan Inglis <alan.n.inglis@gmail.com>
 Description: Can take in images in either .jpg, .jpeg, or .png format and creates a colour palette of the most frequent colours used in the image. Also provides some custom colour palettes.
@@ -12,6 +12,6 @@ RoxygenNote: 7.2.3
 Suggests: knitr, rmarkdown, scales
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-07-18 12:22:01 UTC; alaninglis
+Packaged: 2023-09-26 13:41:24 UTC; alaninglis
 Repository: CRAN
-Date/Publication: 2023-07-19 11:00:05 UTC
+Date/Publication: 2023-09-26 14:00:02 UTC

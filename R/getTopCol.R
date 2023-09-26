@@ -10,6 +10,7 @@
 #' @param sig Integer, the number of decimal places for the color percentage. Default is 4.
 #' @param avgCols Logical, whether to average the colors by groups. Default is TRUE.
 #' @param n_clusters Integer, the number of clusters to use for grouping colors. Default is 5.
+#' @param customExclude Character vector. Optional vector of custom color codes in HEX format to be excluded.
 #'
 #' @return A data frame with the top colors, their frequency, and percentage in the image.
 #'
@@ -25,7 +26,8 @@ getTopCol <- function(path,
                       exclude = TRUE,
                       sig = 4,
                       avgCols = TRUE,
-                      n_clusters = 5) {
+                      n_clusters = 5,
+                      customExclude = NULL) {
 
   # Check if url
   isURL <- function(path){
@@ -75,7 +77,7 @@ getTopCol <- function(path,
 
   # exclude black and white shades
   if(exclude){
-    df_col <- excludeCols(df_col)
+    df_col <- excludeCols(df_col, customExclude = customExclude)
   }
 
   # Average over colours
@@ -119,10 +121,11 @@ getTopCol <- function(path,
 #' in the \code{getTopCol} function. Setting  \code{exclude = TRUE} when calling the \code{getTopCol}
 #' function will exclude the colours form the results.
 #' @param data Data frame of colours
+#' @param customExclude Character vector. Optional vector of custom color codes in HEX format to be excluded.
 #' @return No return value, called for side effects.
 #'
 #' @export
-excludeCols <- function(data){
+excludeCols <- function(data, customExclude = NULL){
 
   # Vector of black shades
   blacks <- c(
@@ -185,29 +188,28 @@ excludeCols <- function(data){
              "#FFFFFE"
   )
 
+    # Add custom colors to the exclusion list
+    if (!is.null(customExclude)) {
+      blacks <- c(blacks, customExclude)
+    }
 
-  colIdxBlack <- which(data$hex %in% blacks)
-  colIdxWhite <- which(data$hex %in% whites)
+    colIdxBlack <- which(data$hex %in% blacks)
+    colIdxWhite <- which(data$hex %in% whites)
 
+    # Remove rows with values in blacks
+    if (length(colIdxBlack) > 0) {
+      res <- data[-colIdxBlack, , drop = FALSE]
+    } else {
+      res <- data
+    }
 
-  # Remove rows with values in blacks
-  if (length(colIdxBlack) > 0) {
-    res <- data[-colIdxBlack, , drop = FALSE]
-  } else {
-    res <- data
+    # Remove rows with values in whites
+    if (length(colIdxWhite) > 0) {
+      res_final <- res[-colIdxWhite, , drop = FALSE]
+    } else {
+      res_final <- res
+    }
+
+    return(res_final)
   }
-
-
-  # Remove rows with values in whites
-  if (length(colIdxWhite) > 0) {
-    res_final <- res[-colIdxWhite, , drop = FALSE]
-  } else {
-    res_final <- res
-  }
-
-  return(res_final)
-
-}
-
-
 
